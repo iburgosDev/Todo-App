@@ -1,0 +1,14 @@
+[
+  {
+    "texto": "Programacion",
+    "completada": true
+  },
+  {
+    "texto": "Entrenamiento",
+    "completada": true
+  },
+  {
+    "texto": "Produccion",
+    "completada": false
+  }
+]
