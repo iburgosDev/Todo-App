@@ -70,8 +70,20 @@ class TodoApp(ctk.CTk):
     #Funcion para cargar y vizualizar los datos desde Json
     def cargar_tareas(self):
         tareas = self.leer_tareas()
-        for tarea in tareas:
-            self.crear_fila_tarea(tarea["texto"], tarea["completada"])
+        if not tareas:
+            self.mostrar_mensaje_vacio()
+        else:
+            for tarea in tareas:
+                self.crear_fila_tarea(tarea["texto"], tarea["completada"])
+
+    def mostrar_mensaje_vacio(self):
+        self.label_vacio = ctk.CTkLabel(
+            self.frame_tareas,
+            text="No tienes tareas pendientes 🎉",
+            text_color="gray",
+            font=ctk.CTkFont(size=14)
+        )
+        self.label_vacio.pack(pady=40)
 
     #Funcion para crear visual
     def crear_fila_tarea(self, texto, completada=False):
@@ -129,6 +141,11 @@ class TodoApp(ctk.CTk):
 
         if texto == "":
             return
+
+        # Eliminar mensaje vacío si existe
+        if hasattr(self, "label_vacio"):
+            self.label_vacio.destroy()
+            del self.label_vacio
 
         self.crear_fila_tarea(texto)
 
