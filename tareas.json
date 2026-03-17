@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "texto": "df",
+    "completada": true
+  },
+  {
+    "texto": "dfb",
+    "completada": true
+  },
+  {
+    "texto": "programar",
+    "completada": false
+  }
+]

@@ -12,7 +12,7 @@ class TodoApp(ctk.CTk):
         super().__init__()
 
         self.title("Todo App - Ignacio Burgos")
-        self.geometry("600x600")
+        self.geometry("600x500")
 
         #Título del Programa
         self.label_titulo = ctk.CTkLabel(
@@ -47,12 +47,12 @@ class TodoApp(ctk.CTk):
         self.frame_tareas = ctk.CTkScrollableFrame(
             self,
             width=500,
-            height=350,
+            height=300,
             label_text="Lista de tareas"
         )
         self.frame_tareas.pack(pady=20)
 
-        # Cargar tareas guardadas al iniciar
+        #Cargar tareas guardadas al iniciar
         self.cargar_tareas()
 
     #Funcion para agregar los datos al archivo Json
@@ -70,31 +70,58 @@ class TodoApp(ctk.CTk):
     #Funcion para cargar y vizualizar los datos desde Json
     def cargar_tareas(self):
         tareas = self.leer_tareas()
-        for texto in tareas:
-            self.crear_fila_tarea(texto)
+        for tarea in tareas:
+            self.crear_fila_tarea(tarea["texto"], tarea["completada"])
 
-    #Funcion para crear vista en fila de los datos desde Json
-    def crear_fila_tarea(self, texto):
+    #Funcion para crear visual
+    def crear_fila_tarea(self, texto, completada=False):
         frame_fila = ctk.CTkFrame(self.frame_tareas)
         frame_fila.pack(fill="x", pady=5, padx=10)
 
+        #Checkbox para marcar como completada
+        var_check = ctk.BooleanVar(value=completada)
+
+        checkbox = ctk.CTkCheckBox(
+            frame_fila,
+            text="",
+            variable=var_check,
+            width=30,
+            command=lambda t=texto, v=var_check: self.toggle_completada(t, v)
+        )
+        checkbox.pack(side="left", padx=5)
+
+        #Texto con tachado si está completada
+        estilo = "overstrike" if completada else "normal"
+        color = "gray" if completada else ("white", "black")
+
         label_tarea = ctk.CTkLabel(
             frame_fila,
-            text=f"• {texto}",
+            text=texto,
             anchor="w",
-            width=380
+            width=350,
+            text_color=color,
+            font=ctk.CTkFont(overstrike=(completada))
         )
-        label_tarea.pack(side="left", padx=10)
+        label_tarea.pack(side="left", padx=5)
 
         boton_eliminar = ctk.CTkButton(
             frame_fila,
-            text="X",
+            text="\u2718",
             width=80,
             fg_color="red",
             hover_color="darkred",
             command=lambda f=frame_fila, t=texto: self.eliminar_tarea(f, t)
         )
         boton_eliminar.pack(side="right", padx=10)
+
+    #Marcar como Completado!!
+    def toggle_completada(self, texto, var_check):
+        tareas = self.leer_tareas()
+        for tarea in tareas:
+            if tarea["texto"] == texto:
+                tarea["completada"] = var_check.get()
+                break
+        self.guardar_tareas(tareas)
 
     #Funcion para agregar la tarea
     def agregar_tarea(self):
@@ -103,26 +130,20 @@ class TodoApp(ctk.CTk):
         if texto == "":
             return
 
-        #Vistas de la Fila!
         self.crear_fila_tarea(texto)
 
-        #Guardar en Json
         tareas = self.leer_tareas()
-        tareas.append(texto)
+        tareas.append({"texto": texto, "completada": False})
         self.guardar_tareas(tareas)
 
-        #Limpiar campo
         self.campo_tarea.delete(0, "end")
 
     #Funcion para eliminar
     def eliminar_tarea(self, frame_fila, texto):
-        #Eliminar vistas
         frame_fila.destroy()
 
-        #Eliminar del Json
         tareas = self.leer_tareas()
-        if texto in tareas:
-            tareas.remove(texto)
+        tareas = [t for t in tareas if t["texto"] != texto]
         self.guardar_tareas(tareas)
 
 if __name__ == "__main__":
